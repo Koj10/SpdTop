@@ -1,0 +1,25 @@
+# dependencies
+node_modules
+npm-debug.log*
+
+# next.js
+.next
+out
+
+# env (inject at runtime)
+.env*
+!.env.example
+
+# git & IDE
+.git
+.gitignore
+.cursor
+.vscode
+
+# misc
+README.md
+Dockerfile
+docker-compose.yml
+*.md
+coverage
+.DS_Store

@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply bg-anthracite text-flame antialiased overflow-x-hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  ::selection {
+    @apply bg-accent/30 text-flame;
+  }
+}
+
+@layer components {
+  .spotlight-orb {
+    @apply absolute rounded-full pointer-events-none opacity-60 will-change-transform;
+    filter: blur(140px);
+  }
+
+  @media (min-width: 768px) {
+    .spotlight-orb {
+      filter: blur(200px);
+    }
+  }
+
+  .spotlight-orb-1 {
+    @apply w-[40vw] h-[40vw] bg-accent/10 animate-orb-1;
+    top: 5%;
+    right: -10%;
+    left: auto;
+  }
+
+  .spotlight-orb-2 {
+    @apply w-[32vw] h-[32vw] bg-spotlight-violet/10 animate-orb-2;
+    bottom: 15%;
+    right: 5%;
+    left: auto;
+    top: auto;
+  }
+
+  .spotlight-orb-3 {
+    @apply w-[28vw] h-[28vw] bg-spotlight-teal/10 animate-orb-3;
+    bottom: -8%;
+    right: 25%;
+    left: auto;
+  }
+
+  .glass {
+    @apply border border-flame/10 bg-black/30 backdrop-blur-md;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center border border-accent/50 bg-accent/10 px-6 py-3 font-display text-sm tracking-widest text-flame transition-all duration-300 hover:border-accent hover:bg-accent/20 hover:shadow-[0_0_24px_rgba(0,255,163,0.15)];
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center border border-flame/20 px-6 py-3 font-whisper text-sm italic text-flame/70 transition-all duration-300 hover:border-flame/50 hover:text-flame;
+  }
+
+  .locale-switch {
+    @apply relative inline-flex shrink-0 overflow-hidden border border-flame/10 bg-black/30 backdrop-blur-md;
+  }
+
+  .locale-switch-option {
+    @apply relative flex min-w-[2.75rem] items-center justify-center px-3 py-2 font-mono text-[10px] uppercase tracking-[0.28em] text-flame/35 transition-colors duration-300 hover:text-flame/65;
+  }
+
+  .locale-switch-option-active {
+    @apply text-accent;
+  }
+
+  .section-padding {
+    @apply px-6 py-20 md:px-10 md:py-28 lg:px-16;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-flame via-accent to-spotlight-teal bg-clip-text text-transparent;
+  }
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow:
+      0 0 24px rgba(0, 255, 163, 0.2),
+      0 0 48px rgba(0, 255, 163, 0.08);
+  }
+
+  .gpu {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
