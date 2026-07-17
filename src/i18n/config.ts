@@ -1,5 +1,5 @@
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://spd-top.ru";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://spdtop.com";
 
 export const locales = ["en", "ru"] as const;
 export type Locale = (typeof locales)[number];
