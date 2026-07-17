@@ -17,6 +17,45 @@ function trim(value: unknown, max: number): string {
   return value.trim().slice(0, max);
 }
 
+function telegramErrorResponse(error: {
+  code: string;
+  cause?: unknown;
+  status?: number;
+  body?: string;
+  description?: string;
+}) {
+  switch (error.code) {
+    case "not_configured":
+      console.error("[brief] Telegram env vars missing on server");
+      return NextResponse.json(
+        { error: "not_configured", detail: "Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in .env" },
+        { status: 503 },
+      );
+    case "network_error":
+      console.error("[brief] Telegram network error:", error.cause);
+      return NextResponse.json(
+        {
+          error: "network_error",
+          detail: "Server cannot reach Telegram API. Check firewall or set TELEGRAM_API_URL proxy.",
+        },
+        { status: 502 },
+      );
+    case "telegram_error":
+      console.error("[brief] Telegram API error:", error.status, error.body);
+      return NextResponse.json(
+        {
+          error: "telegram_error",
+          detail:
+            error.description ??
+            "Telegram rejected the message. Check bot token, chat ID, and that the bot is in the group.",
+        },
+        { status: 502 },
+      );
+    default:
+      return NextResponse.json({ error: "send_failed" }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as BriefPayload;
@@ -53,21 +92,7 @@ export async function POST(request: Request) {
     const result = await sendTelegramMessage(text);
 
     if (!result.ok) {
-      switch (result.error.code) {
-        case "not_configured":
-          console.error("[brief] Telegram env vars missing on server");
-          return NextResponse.json({ error: "not_configured" }, { status: 503 });
-        case "network_error":
-          console.error("[brief] Telegram network error:", result.error.cause);
-          return NextResponse.json({ error: "network_error" }, { status: 502 });
-        case "telegram_error":
-          console.error(
-            "[brief] Telegram API error:",
-            result.error.status,
-            result.error.body,
-          );
-          return NextResponse.json({ error: "telegram_error" }, { status: 502 });
-      }
+      return telegramErrorResponse(result.error);
     }
 
     return NextResponse.json({ ok: true });
