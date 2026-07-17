@@ -21,21 +21,28 @@ export async function GET() {
   const result = await telegramGetMe();
 
   if (!result.ok) {
-    if (result.error.code === "network_error") {
-      return NextResponse.json({
-        ok: false,
-        configured: true,
-        networkError: true,
-        hint: "Server cannot reach api.telegram.org. Add TELEGRAM_API_URL proxy to .env or open outbound HTTPS.",
-      });
+    switch (result.error.code) {
+      case "network_error":
+        return NextResponse.json({
+          ok: false,
+          configured: true,
+          networkError: true,
+          hint: "Server cannot reach api.telegram.org. Add TELEGRAM_API_URL proxy to .env or open outbound HTTPS.",
+        });
+      case "not_configured":
+        return NextResponse.json({
+          ok: false,
+          configured: false,
+          hint: "TELEGRAM_BOT_TOKEN is missing or empty.",
+        });
+      case "telegram_error":
+        return NextResponse.json({
+          ok: false,
+          configured: true,
+          telegramError: true,
+          detail: result.error.description ?? "Invalid bot token",
+        });
     }
-
-    return NextResponse.json({
-      ok: false,
-      configured: true,
-      telegramError: true,
-      detail: result.error.description ?? "Invalid bot token",
-    });
   }
 
   return NextResponse.json({
