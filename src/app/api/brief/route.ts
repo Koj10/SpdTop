@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { escapeTelegramText, sendTelegramMessage } from "@/lib/telegram";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 type BriefPayload = {
   name?: string;
   contact?: string;
@@ -37,17 +40,35 @@ export async function POST(request: Request) {
 
     const localeLabel = locale === "ru" ? "RU" : "EN";
     const text = [
-      "🆕 New brief · SpdTop website",
+      "New brief · SpdTop website",
       "",
-      `🌐 Locale: ${localeLabel}`,
-      `👤 Name: ${escapeTelegramText(name)}`,
-      `📱 Contact: ${escapeTelegramText(contact)}`,
+      `Locale: ${localeLabel}`,
+      `Name: ${escapeTelegramText(name)}`,
+      `Contact: ${escapeTelegramText(contact)}`,
       "",
-      "📋 Project:",
+      "Project:",
       escapeTelegramText(message),
     ].join("\n");
 
-    await sendTelegramMessage(text);
+    const result = await sendTelegramMessage(text);
+
+    if (!result.ok) {
+      switch (result.error.code) {
+        case "not_configured":
+          console.error("[brief] Telegram env vars missing on server");
+          return NextResponse.json({ error: "not_configured" }, { status: 503 });
+        case "network_error":
+          console.error("[brief] Telegram network error:", result.error.cause);
+          return NextResponse.json({ error: "network_error" }, { status: 502 });
+        case "telegram_error":
+          console.error(
+            "[brief] Telegram API error:",
+            result.error.status,
+            result.error.body,
+          );
+          return NextResponse.json({ error: "telegram_error" }, { status: 502 });
+      }
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {
